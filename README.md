@@ -1,4 +1,4 @@
-# CAML: Consensus Aggregation of Molecular Models
+# CAML: A Conflict-Aware Molecular Language Model Merging Framework for Multi-Constraint Molecular Generation
 
 ## Project Overview
 
