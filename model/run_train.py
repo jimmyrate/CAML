@@ -13,7 +13,7 @@ from lit_chemgpt import LitChemGPT  # 模型文件保持不变
 # 参数设定
 # ========================
 CSV_PATH = "/root/autodl-tmp/nash_merging/dataset/filtered_selfies_dataset_pretrain.csv"
-TOKENIZER_PATH = "/root/autodl-tmp/nash_merging/MolGen"  # ✅ 修改为 SELFIES tokenizer 路径
+TOKENIZER_PATH = "/root/autodl-tmp/nash_merging/MolGen"
 OUTPUT_MODEL_PATH = "chemgpt_pretrained_selfies/"
 BATCH_SIZE = 128
 MAX_LENGTH = 128
@@ -22,16 +22,16 @@ LR = 2e-5
 MODEL_HIDDEN_SIZE = 384
 
 # ========================
-# Step 1: 加载 SELFIES tokenizer
+
 # ========================
 
 tokenizer = AutoTokenizer.from_pretrained("/root/autodl-tmp/nash_merging/MolGen")
 # tokenizer2 = PreTrainedTokenizerFast.from_pretrained(TOKENIZER_PATH)
-# tokenizer.add_special_tokens({'pad_token': '[PAD]'})  # 通常已存在，保险起见保留
+# tokenizer.add_special_tokens({'pad_token': '[PAD]'})
 # tokenizer.add_special_tokens({'bos_token': '<BOS>', 'eos_token': '<EOS>'})
 
 # ========================
-# Step 2: 定义 SELFIES 数据集
+
 # ========================
 class SelfiesDataset(Dataset):
     def __init__(self, smiles_list, tokenizer, max_length=512):
@@ -43,10 +43,10 @@ class SelfiesDataset(Dataset):
             try:
                 sf_string = sf.encoder(smi)
                 token_list = sf.split_selfies(sf_string)
-                formatted = " ".join(token_list)  # 只保留 token 序列，不加 BOS/EOS
+                formatted = " ".join(token_list)
                 self.selfies_list.append(formatted)
             except Exception:
-                continue  # 跳过非法 SMILES
+                continue
 
     def __len__(self):
         return len(self.selfies_list)
@@ -58,7 +58,7 @@ class SelfiesDataset(Dataset):
             truncation=True,
             padding='max_length',
             max_length=self.max_length,
-            return_tensors="pt",  # 返回的是 dict，包含 input_ids 和 attention_mask
+            return_tensors="pt",
         )
         input_ids = encoding['input_ids'].squeeze(0)
         attention_mask = encoding['attention_mask'].squeeze(0)
@@ -66,17 +66,13 @@ class SelfiesDataset(Dataset):
         return {
             "input_ids": input_ids,
             "attention_mask": attention_mask,
-            "labels": input_ids  # 自回归训练时通常用 input_ids 作为 labels
+            "labels": input_ids
         }
 
 
 class SelfiesDatasetFromCSV(Dataset):
     def __init__(self, selfies_list, tokenizer, max_length=512):
-        """
-        selfies_list: 已经是空格分隔的 SELFIES 字符串列表
-        tokenizer: transformers 的 tokenizer
-        max_length: 最大序列长度
-        """
+
         self.selfies_list = selfies_list
         self.tokenizer = tokenizer
         self.max_length = max_length
@@ -85,7 +81,7 @@ class SelfiesDatasetFromCSV(Dataset):
         return len(self.selfies_list)
 
     def __getitem__(self, idx):
-        text = self.selfies_list[idx].strip()  # 去掉可能的多余空格
+        text = self.selfies_list[idx].strip()
         encoding = self.tokenizer(
             text,
             truncation=True,
@@ -111,7 +107,7 @@ class SmilesDataset(Dataset):
         self.add_special_tokens = add_special_tokens
 
         for smi in tqdm(smiles_list):
-            # 此处可以加入SMILES合法性检查
+
             self.smiles_list.append(smi)
 
     def __len__(self):
@@ -120,13 +116,12 @@ class SmilesDataset(Dataset):
     def __getitem__(self, idx):
         text = self.smiles_list[idx]
 
-        # 添加起始和结束token，通常是 tokenizer.cls_token / bos_token 和 tokenizer.sep_token / eos_token
+
         if self.add_special_tokens:
             if self.tokenizer.bos_token is not None and self.tokenizer.eos_token is not None:
                 text = self.tokenizer.bos_token + text + self.tokenizer.eos_token
             else:
-                text = "<BOS>" + text + "<EOS>"  # 需要确保你的tokenizer中加入了这两个token
-
+                text = "<BOS>" + text + "<EOS>"
         encoding = self.tokenizer(
             text,
             truncation=True,
@@ -141,11 +136,11 @@ class SmilesDataset(Dataset):
         return {
             "input_ids": input_ids,
             "attention_mask": attention_mask,
-            "labels": input_ids  # 适用于自回归语言建模
+            "labels": input_ids
         }
 
 # ========================
-# Step 3: 加载数据并转换为 SELFIES
+
 # ========================
 df = pd.read_csv(CSV_PATH)
 selfies_list = df["SELFIES"].dropna().tolist()
@@ -157,12 +152,12 @@ dataset = SelfiesDatasetFromCSV(selfies_list, tokenizer, max_length=128)
 dataloader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True)
 
 # ========================
-# Step 4: 初始化模型
+
 # ========================
 model = LitChemGPT(
     model_size=MODEL_HIDDEN_SIZE,
     lr=LR,
-    tokenizer_dir=TOKENIZER_PATH,  # ✅ 注意传入的是 SELFIES tokenizer 路径
+    tokenizer_dir=TOKENIZER_PATH,
     logs_dir="logs",
     cache_path="."
 )
@@ -170,11 +165,11 @@ model = LitChemGPT(
 total_params = sum(p.numel() for p in model.model.parameters())
 trainable_params = sum(p.numel() for p in model.model.parameters() if p.requires_grad)
 
-print(f"🚀 模型总参数量: {total_params:,}")
-print(f"✅ 可训练参数量: {trainable_params:,}")
+print(f"🚀 Total number of model parameters: {total_params:,}")
+print(f"✅ Number of trainable parameters: {trainable_params:,}")
 
 # ========================
-# Step 5: 设置回调与 Trainer
+
 # ========================
 checkpoint_callback = ModelCheckpoint(
     monitor="val_loss",
@@ -194,15 +189,15 @@ trainer = Trainer(
 )
 
 # ========================
-# Step 6: 开始训练
+
 # ========================
 seed_everything(42)
 trainer.fit(model, dataloader)
 
 # ========================
-# Step 7: 保存模型与 tokenizer
+
 # ========================
 model.model.save_pretrained(OUTPUT_MODEL_PATH)
 tokenizer.save_pretrained(OUTPUT_MODEL_PATH)
 
-print(f"✅ 模型已保存至: {OUTPUT_MODEL_PATH}")
+print(f"✅ model save to: {OUTPUT_MODEL_PATH}")
