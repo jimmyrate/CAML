@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-CAML (Consensus Aggregation of Molecular Models) is a framework for fusing multiple molecular property generation models, designed to generate compounds that simultaneously meet multiple molecular property targets by optimizing the weights and parameters of different models.
+CAML is a framework for fusing multiple molecular property generation models, designed to generate compounds that simultaneously meet multiple molecular property targets by optimizing the weights and parameters of different models.
 
 This project primarily addresses the challenge of single models struggling to simultaneously optimize multiple molecular properties. By intelligently fusing multiple models specialized for different properties, it enables more comprehensive molecular design.
 
