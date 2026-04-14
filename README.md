@@ -109,7 +109,7 @@ tv_flat_checks = flat_ft - flat_ptm
 
 Calculate the parameter differences between fine-tuned models and the pretrained model to form task vectors.
 
-### 2. Model Fusion
+### 2. Model Merging
 
 ```python
 def merge_with_nash_merging(task_deltas, alphas, ks, merge_func="sum", device=None):
@@ -178,40 +178,13 @@ Saving best SMILES to best_nash_smiles.csv...
 SMILES saved.
 ```
 
-## Technical Features
-
-1. **Flexible fusion strategies**: Supports multiple fusion methods to adapt to different application scenarios
-2. **Efficient parameter optimization**: Uses CMA-ES algorithm to quickly find optimal fusion parameters
-3. **Multi-property balancing**: Balances multiple property objectives through Nash bargaining theory
-4. **Robust molecular evaluation**: Performs comprehensive property evaluation on generated molecules
-5. **Scalability**: Easy to add new property evaluations and fusion strategies
-
-## Application Scenarios
-
-- **Drug discovery**: Generate molecules with specific biological activity and pharmacokinetic properties
-- **Materials science**: Design new materials with specific physicochemical properties
-- **Chemical production**: Optimize molecular synthetic accessibility and cost
-
 ## Citation
 
 If you use CAML in your research, please cite the following work:
 
 ```
-@article{CAML2026,
-  title={Consensus Aggregation of Molecular Models for Multi-Property Optimization},
-  author={Your Name and Collaborators},
-  journal={Journal of Chemical Information and Modeling},
-  year={2026}
-}
 ```
 
 ## License
 
 This project is licensed under the MIT License. See the LICENSE file for details.
-
-## Contact
-
-For questions or suggestions, please contact:
-
-- Email: your.email@example.com
-- GitHub: https://github.com/yourusername/CAML
