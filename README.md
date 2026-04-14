@@ -6,14 +6,6 @@ CAML (Consensus Aggregation of Molecular Models) is a framework for fusing multi
 
 This project primarily addresses the challenge of single models struggling to simultaneously optimize multiple molecular properties. By intelligently fusing multiple models specialized for different properties, it enables more comprehensive molecular design.
 
-## Core Features
-
-- **Multi-model fusion**: Fuses multiple models optimized for different molecular properties
-- **Parameter optimization**: Uses CMA-ES algorithm to optimize fusion parameters
-- **Multi-property balancing**: Balances multiple property objectives through Nash bargaining theory
-- **Molecular generation and evaluation**: Generates molecules from the fused model and evaluates their multiple properties
-- **Flexible fusion strategies**: Supports multiple fusion methods such as sum, mean, max
-
 ## Project Structure
 
 ```
